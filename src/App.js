@@ -1,26 +1,128 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Toast from "react-bootstrap/Toast";
+import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import "./App.css";
+import ListGroup from "react-bootstrap/ListGroup";
+import { Row, Col } from "react-bootstrap";
 
-function App() {
-  return (
-    <div className="App">
-      <form>
-  <label>
-    Name:
-    <input type="text" name="name" />
-  </label>
-  <label>
-    Age:
-    <input type="text" name="age" />
-  </label>
-  <label>
-    Id:
-    <input type="text" name="id" />
-  </label>
-  <input type="submit" value="Submit" />
-</form>
-    </div>
-  );
+const ExampleToast = ({ children }) => {
+   const [show, toggleShow] = useState(true);
+   return (
+      <Toast show={show} onClose={() => toggleShow(!show)}>
+         <Toast.Header>
+            <strong className="mr-auto">React-Bootstrap</strong>
+         </Toast.Header>
+         <Toast.Body>{children}</Toast.Body>
+      </Toast>
+   );
+};
+const App = () => (
+   <Container className="p-3">
+      
+      <Container className="p-5 mb-4 bg-light rounded-3">
+         <Form>
+            <Form.Group className="mb-3" controlId="formBasicId">
+               <Form.Label>Id</Form.Label>
+               <Form.Control id="id" type="number" placeholder="Enter id" />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicName">
+               <Form.Label>Name</Form.Label>
+               <Form.Control id="name" type="string" placeholder="Enter name" />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicAge">
+               <Form.Label>Age</Form.Label>
+               <Form.Control id="age" type="string" placeholder="Enter age" />
+            </Form.Group>
+            <Button variant="primary" type="button" onClick={WebSocketTest}>
+               Submit
+            </Button>
+         </Form>
+
+            <div id="userslist"></div>
+
+      </Container>
+   </Container>
+
+);
+
+function listarUsuarios() {
+   if ("WebSocket" in window) {
+      // Let us open a web socket
+      var ws = new WebSocket("wss://erk5lp2jwb.execute-api.eu-central-1.amazonaws.com/sandbox");
+
+      ws.onopen = function () {
+
+
+         // Web Socket is connected, send data using send()
+         ws.send(`{"action":"users"}`);
+      };
+
+      ws.onmessage = function (event) {
+         var received_msg = event.data;
+
+         var listaUsuarios = JSON.parse(received_msg);
+         document.getElementById("userslist").innerHTML = ''
+         for (let index = 0; index < listaUsuarios.length; index++) {
+            document.getElementById("userslist").innerHTML += `<li class="list-group-item" href="#link0" >${Object.values(listaUsuarios[index])[4]}</li>`
+            
+            //<ListGroup.Item action href="#link0" >${Object.values(listaUsuarios[index])[4]}</ListGroup.Item>
+            //`<div>${Object.values(listaUsuarios[index])[4]}</div>`
+         }
+         //console.log(listaUsuarios[0][usuername])
+         //console.log(Object.values(listaUsuarios[0])[4])
+      };
+
+      ws.onclose = function () {
+
+         // websocket is closed.
+         alert("Connection is closed...");
+      };
+
+   } else {
+
+      // The browser doesn't support WebSocket
+      alert("WebSocket NOT supported by your Browser!");
+   }
+
 }
+
+function WebSocketTest() {
+   console.log("entro a la function")
+   if ("WebSocket" in window) {
+
+
+      // Let us open a web socket
+      var ws = new WebSocket("wss://erk5lp2jwb.execute-api.eu-central-1.amazonaws.com/sandbox");
+
+      ws.onopen = function () {
+
+
+         // Web Socket is connected, send data using send()
+         ws.send(`{"action":"user", "userid": "${document.getElementById("id").value}", "username": "${document.getElementById("name").value}", "userage": "${document.getElementById("age").value}"}`);
+         alert("Message is sent...");
+      };
+
+      ws.onmessage = function (event) {
+         var received_msg = event.data;
+         alert("Message is received..." + received_msg);
+      };
+
+      ws.onclose = function () {
+
+         // websocket is closed.
+         //alert("Connection is closed...");
+      };
+      listarUsuarios()
+   } else {
+
+      // The browser doesn't support WebSocket
+      alert("WebSocket NOT supported by your Browser!");
+
+   }
+}
+
+listarUsuarios()
 
 export default App;
