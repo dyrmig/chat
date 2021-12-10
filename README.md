@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# React.JS App example
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplication that connects with DynamoDB using two Lambdas(included in the lambas folder) and list the data from a table 'users', with the option of inserting a new entry with a form
 
 ## Available Scripts
 
